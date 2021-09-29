@@ -1,0 +1,22 @@
+body {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.game-container {
+    display: grid;
+    width: min-content;
+    height: min-content;
+    justify-content: center;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+}
+
+
+.cell {
+    width: 100px;
+    height: 100px;
+    border: 1px black solid;
+}
