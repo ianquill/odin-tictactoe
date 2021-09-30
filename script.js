@@ -32,39 +32,37 @@ let gameBoard = (function() {
             return;
         }
 
-        checkForWin(i, j, _currentPlayer);
+        checkForWin(_currentPlayer);
         
     }
     
-    function checkForWin(yCord, xCord, player) {
-
-        console.log(`${xCord} + ${yCord} + ${player}`);
+    function checkForWin(player) {
 
         for (let y = 0; y < board.length; y++) {
             for (let x = 0; x < board[y].length; x++) {
 
                 if (board[y][x] === player) {
                     // console.log(`found ${player} at ${x}, ${y}`);
-                    if (board[yCord][x+1] === player) {
+                    if (board[y][x+1] === player) {
                         // console.log("found horizontal pair");
-                        if (board[yCord][x+2] === player) {
-                            console.log(`CONGRATS you've found a horizontal match 3 at ${x}, ${y}`);
+                        if (board[y][x+2] === player) {
+                            console.log(`CONGRATS ${player} found a horizontal match 3`);
                         } else break;
                     }
-                    if (y < 2 && board[y+1][xCord] === player) {
+                    if (y < 2 && board[y+1][x] === player) {
                         // console.log("found vertical pair");
-                        if (y < 1 && board[y+2][xCord] === player) {
-                            console.log("CONGRATS you've found a vertical match 3");
+                        if (y < 1 && board[y+2][x] === player) {
+                            console.log(`CONGRATS ${player} found a vertical match 3`);
                         } else break;
                     }
                     if (y < 2 && board[y+1][x+1] === player) {
                         if (y < 1 && board[y+2][x+2] === player) {
-                            console.log("CONGRATS you've found a diagonal match3");
+                            console.log(`CONGRATS ${player} found a diagonal match3`);
                         } else break;
                     }
                     if (y < 2 && board[y+1][x-1] === player) {
                         if (y < 1 && board[y+2][x-2] === player) {
-                            console.log("CONGRATS 2you've found a diagonal match 3");
+                            console.log(`CONGRATS ${player} found a diagonal match 3`);
                         } else break;
                     }
                 }
@@ -72,9 +70,9 @@ let gameBoard = (function() {
             
         }
 
-        // if (gameController.getTurnCounter() >= 9) {
-        //     console.log("TIE GAME")
-        // }
+        if (gameController.getTurnCounter() >= 9) {
+            console.log("TIE GAME")
+        }
     }
 
     return { createBoard, checkCell, board };
