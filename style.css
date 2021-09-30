@@ -3,6 +3,8 @@ body {
     height: 100%;
     align-items: center;
     justify-content: center;
+
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 .game-container {
@@ -11,11 +13,17 @@ body {
     height: min-content;
     justify-content: center;
     grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);                                         
 }
 
 
 .cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    font-size: 60px;
+
     width: 100px;
     height: 100px;
     border: 1px black solid;
