@@ -22,17 +22,23 @@ let gameBoard = (function() {
 
     function checkCell (i, j) {
         // check cell position at board[i][j] if it has a value stored
+        const _currentPlayer = gameController.getCurrentPlayer();
+
         if (board[i][j] === "empty") {
-            board[i][j] = gameController.getCurrentPlayer();
+            board[i][j] = _currentPlayer;
+            gameController.switchPlayer();
+            gameController.addTurn();
         } else {
             return;
         }
 
-        checkForWin(i, j, gameController.getCurrentPlayer());
+        checkForWin(i, j, _currentPlayer);
         
     }
     
     function checkForWin(yCord, xCord, player) {
+
+        console.log(`${xCord} + ${yCord} + ${player}`);
 
         for (let y = 0; y < board.length; y++) {
             for (let x = 0; x < board[y].length; x++) {
@@ -42,7 +48,7 @@ let gameBoard = (function() {
                     if (board[yCord][x+1] === player) {
                         // console.log("found horizontal pair");
                         if (board[yCord][x+2] === player) {
-                            console.log("CONGRATS you've found a horizontal match 3");
+                            console.log(`CONGRATS you've found a horizontal match 3 at ${x}, ${y}`);
                         } else break;
                     }
                     if (y < 2 && board[y+1][xCord] === player) {
@@ -65,16 +71,12 @@ let gameBoard = (function() {
             }
             
         }
+
+        // if (gameController.getTurnCounter() >= 9) {
+        //     console.log("TIE GAME")
+        // }
     }
 
-    function checkDistance(cord1, cord2) {
-        let distance = cord1 - cord2;
-        if (distance < 0) {
-            distance *= -1;
-        } 
-        return distance;
-    }
-    // clear board 
     return { createBoard, checkCell, board };
 
 })();
@@ -131,11 +133,20 @@ const gameController = (function() {
     'use strict'
 
     let currentPlayer = "player1";    // eventually add a function that randomizes this starting value
+    let turnCounter = 0;
+
+    function addTurn() {
+        turnCounter++;
+    }
+
+    function getTurnCounter() {
+        return turnCounter;
+    }
 
     function clickCell(i, j) {
         gameBoard.checkCell(i, j);
         displayController.refreshBoard();
-        switchPlayer();
+        // switchPlayer();
         // check gameBoard for the specific cell
             // displayController.updateBoard();
             // if legal, displayController is updated
@@ -154,7 +165,7 @@ const gameController = (function() {
         return currentPlayer;
     }
 
-    return {clickCell, getCurrentPlayer}
+    return {clickCell, getCurrentPlayer, switchPlayer, getTurnCounter, addTurn}
 
 })();
 
