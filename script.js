@@ -23,14 +23,57 @@ let gameBoard = (function() {
     function checkCell (i, j) {
         // check cell position at board[i][j] if it has a value stored
         if (board[i][j] === "empty") {
-            console.log(gameController.getCurrentPlayer());
             board[i][j] = gameController.getCurrentPlayer();
-            console.log("recorded " + gameController.getCurrentPlayer());
         } else {
             return;
         }
+
+        checkForWin(i, j, gameController.getCurrentPlayer());
+        
+    }
+    
+    function checkForWin(yCord, xCord, player) {
+
+        for (let y = 0; y < board.length; y++) {
+            for (let x = 0; x < board[y].length; x++) {
+
+                if (board[y][x] === player) {
+                    // console.log(`found ${player} at ${x}, ${y}`);
+                    if (board[yCord][x+1] === player) {
+                        // console.log("found horizontal pair");
+                        if (board[yCord][x+2] === player) {
+                            console.log("CONGRATS you've found a horizontal match 3");
+                        } else break;
+                    }
+                    if (y < 2 && board[y+1][xCord] === player) {
+                        // console.log("found vertical pair");
+                        if (y < 1 && board[y+2][xCord] === player) {
+                            console.log("CONGRATS you've found a vertical match 3");
+                        } else break;
+                    }
+                    if (y < 2 && board[y+1][x+1] === player) {
+                        if (y < 1 && board[y+2][x+2] === player) {
+                            console.log("CONGRATS you've found a diagonal match3");
+                        } else break;
+                    }
+                    if (y < 2 && board[y+1][x-1] === player) {
+                        if (y < 1 && board[y+2][x-2] === player) {
+                            console.log("CONGRATS 2you've found a diagonal match 3");
+                        } else break;
+                    }
+                }
+            }
+            
+        }
     }
 
+    function checkDistance(cord1, cord2) {
+        let distance = cord1 - cord2;
+        if (distance < 0) {
+            distance *= -1;
+        } 
+        return distance;
+    }
     // clear board 
     return { createBoard, checkCell, board };
 
@@ -102,13 +145,9 @@ const gameController = (function() {
     function switchPlayer() {
         if (currentPlayer === "player1") {
             currentPlayer = "player2";
-            console.log("changed to player2")
-            console.log(currentPlayer);
         } else if (currentPlayer === "player2") {
             currentPlayer = "player1";
         }
-        console.log("current player: ", gameController.currentPlayer);
-        console.log("other current player: ", currentPlayer);
     }
 
     function getCurrentPlayer() {
