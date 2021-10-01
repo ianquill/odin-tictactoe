@@ -79,8 +79,8 @@ let gameBoard = (function() {
         return board;
     }
 
-    function setBoard(board, x, y, value) {
-        board[y][x] = value;
+    function setBoard(x, y, value) {
+        gameBoard.board[y][x] = value;
     }
 
     return { createBoard, checkCell, board, getBoard, setBoard };
@@ -158,9 +158,9 @@ const gameController = (function() {
         if (currentPlayer === "player1") {
             currentPlayer = "player2";
 
-            // console.log(findBestMove(gameBoard.getBoard()));
-            // clickCell(findBestMove(gameBoard.getBoard()));
-            // displayController.refreshBoard();
+            makeBestMove(findBestMove(gameBoard.getBoard()));
+            displayController.refreshBoard();
+
         } else if (currentPlayer === "player2") {
             currentPlayer = "player1";
         }
@@ -225,12 +225,11 @@ const gameController = (function() {
             for (let y = 0; y < board.length; y++) {
                 for (let x = 0; x < board[y].length; x++) {
                     if (board[y][x] === "empty") {
-                        gameBoard.setBoard(board, x, y, "player2");
-                        // board[y][x] = "player2";
+                        gameBoard.setBoard(x, y, "player2");
 
                         maxEval = Math.max(maxEval, minimax(board, depth + 1, !maximizingPlayer));
 
-                        gameBoard.setBoard(board, x, y, "empty");
+                        gameBoard.setBoard(x, y, "empty");
 
                     }
                     
@@ -249,11 +248,12 @@ const gameController = (function() {
 
                     if (board[y][x] === "empty") {
 
-                        gameBoard.setBoard(board, x, y, "player1");
+                        gameBoard.setBoard(x, y, "player1");
+                        // console.log(board);
 
                         maxEval = Math.min(maxEval, minimax(board, depth + 1, !maximizingPlayer));
 
-                        gameBoard.setBoard(board, x, y, "empty");
+                        gameBoard.setBoard(x, y, "empty");
 
                     }
                 }
@@ -274,10 +274,10 @@ const gameController = (function() {
             for (let x = 0; x < 3; x++) {
                 
                 if (board[y][x] === "empty") {
-                    gameBoard.setBoard(board, x, y, "player2");
+                    gameBoard.setBoard(x, y, "player2");
                     
                     let moveVal = minimax(board, 0, false);
-                    gameBoard.setBoard(board, x, y, "empty");
+                    gameBoard.setBoard(x, y, "empty");
 
                     if (moveVal > bestVal) {
                         bestMove.row = y;
