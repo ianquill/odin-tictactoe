@@ -75,7 +75,15 @@ let gameBoard = (function() {
         }
     }
 
-    return { createBoard, checkCell, board };
+    function getBoard() {
+        return board;
+    }
+
+    function setBoard(board, x, y, value) {
+        board[y][x] = value;
+    }
+
+    return { createBoard, checkCell, board, getBoard, setBoard };
 
 })();
 
@@ -149,6 +157,10 @@ const gameController = (function() {
     function switchPlayer() {
         if (currentPlayer === "player1") {
             currentPlayer = "player2";
+
+            // console.log(findBestMove(gameBoard.getBoard()));
+            // clickCell(findBestMove(gameBoard.getBoard()));
+            // displayController.refreshBoard();
         } else if (currentPlayer === "player2") {
             currentPlayer = "player1";
         }
@@ -158,7 +170,141 @@ const gameController = (function() {
         return currentPlayer;
     }
 
-    return {clickCell, getCurrentPlayer, switchPlayer, getTurnCounter, addTurn}
+    function evaluateBoard(board) {
+        for (let row = 0; row < 3; row++)
+        {
+            if (board[row][0] == board[row][1] && board[row][1] == board[row][2]) {
+                if (board[row][0] == "player2")
+                    return +10;
+                else if (board[row][0] == "player1")
+                    return -10;
+            }
+        }    
+
+        for (let col = 0; col < 3; col++) {
+            if (board[0][col] == board[1][col] && board[1][col] == board[2][col]) {
+                if (board[0][col] == "player2")
+                    return +10;
+                else if (board[0][col] == "player1")
+                    return -10;
+            }
+        }
+
+        if (board[0][0] == board[1][1] && board[1][1] == board[2][2]) {
+            if (board[0][0] == "player2")
+                return +10;
+            else if (board[0][0] == "player1")
+                return -10;
+        }
+
+        if (board[0][2] == board[1][1] && board[1][1] == board[2][0]) {
+            if (board[0][2] == "player2")
+                return +10;
+            else if (board[0][2] == "player1")
+                return -10;
+        }
+
+        return 0;
+
+    }
+
+    function minimax(board, depth, maximizingPlayer) {
+        // check if game is over
+        let score = evaluateBoard(board);
+
+        if (score === 10)
+            return score;
+        if (score === -10)
+            return score;
+        if (getTurnCounter() >= 9)
+            return 0;
+        
+        if (maximizingPlayer) {
+            let maxEval = -1000;
+
+            for (let y = 0; y < board.length; y++) {
+                for (let x = 0; x < board[y].length; x++) {
+                    if (board[y][x] === "empty") {
+                        gameBoard.setBoard(board, x, y, "player2");
+                        // board[y][x] = "player2";
+
+                        maxEval = Math.max(maxEval, minimax(board, depth + 1, !maximizingPlayer));
+
+                        gameBoard.setBoard(board, x, y, "empty");
+
+                    }
+                    
+                }
+                
+            }
+
+            return maxEval-depth;
+        }
+
+        else {
+            let maxEval = 1000; 
+
+            for (let y = 0; y < board.length; y++) {
+                for (let x = 0; x < board[y].length; x++) {
+
+                    if (board[y][x] === "empty") {
+
+                        gameBoard.setBoard(board, x, y, "player1");
+
+                        maxEval = Math.min(maxEval, minimax(board, depth + 1, !maximizingPlayer));
+
+                        gameBoard.setBoard(board, x, y, "empty");
+
+                    }
+                }
+            }
+
+            return maxEval+depth;
+        }
+    }
+
+    function findBestMove(board) {
+
+        let bestVal = -Infinity;
+        let bestMove = new Move();
+        bestMove.row = -1;
+        bestMove.col = -1;
+
+        for (let y = 0; y < 3; y++) {
+            for (let x = 0; x < 3; x++) {
+                
+                if (board[y][x] === "empty") {
+                    gameBoard.setBoard(board, x, y, "player2");
+                    
+                    let moveVal = minimax(board, 0, false);
+                    gameBoard.setBoard(board, x, y, "empty");
+
+                    if (moveVal > bestVal) {
+                        bestMove.row = y;
+                        bestMove.col = x;
+                        bestVal = moveVal;
+                    }
+                }
+                
+            }
+
+
+        }
+        return bestMove;
+    }
+
+    function makeBestMove(bestMove) {
+        clickCell(bestMove.row, bestMove.col);
+        console.log(`clicked on ${bestMove.col}, ${bestMove.row}`);
+    }
+
+    class Move {
+        constructor() {
+            let row,col;
+        }
+    }
+
+    return {clickCell, getCurrentPlayer, switchPlayer, getTurnCounter, addTurn, evaluateBoard, findBestMove, makeBestMove}
 
 })();
 
