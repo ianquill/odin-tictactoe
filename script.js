@@ -144,11 +144,6 @@ const gameController = (function() {
     function clickCell(i, j) {
         gameBoard.checkCell(i, j);
         displayController.refreshBoard();
-        // switchPlayer();
-        // check gameBoard for the specific cell
-            // displayController.updateBoard();
-            // if legal, displayController is updated
-            // and update gameController to check for win condition
     }
     
     function switchPlayer() {
