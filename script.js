@@ -83,7 +83,13 @@ let gameBoard = (function() {
         gameBoard.board[y][x] = value;
     }
 
-    return { createBoard, checkCell, board, getBoard, setBoard };
+    return { 
+        createBoard, 
+        checkCell, 
+        board, 
+        getBoard, 
+        setBoard,
+    };
 
 })();
 
@@ -136,10 +142,20 @@ const player1 = Player("Ian");
 const player2 = Player("Eleanor");
 
 const gameController = (function() {
-    'use strict'
 
     let currentPlayer = "player1";    // eventually add a function that randomizes this starting value
     let turnCounter = 0;
+
+    function isOpenSpots(board) {
+        for (let y = 0; y < 3; y++) {
+            for (let x = 0; x < 3; x++) {
+                if (board[y][x] === "empty") {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     function addTurn() {
         turnCounter++;
@@ -158,6 +174,8 @@ const gameController = (function() {
         if (currentPlayer === "player1") {
             currentPlayer = "player2";
 
+            console.log(`initial gameboard is: ${gameBoard.getBoard()}`);
+
             makeBestMove(findBestMove(gameBoard.getBoard()));
             displayController.refreshBoard();
 
@@ -171,9 +189,11 @@ const gameController = (function() {
     }
 
     function evaluateBoard(board) {
+
+        // Evaluate Horizontally
         for (let row = 0; row < 3; row++)
         {
-            if (board[row][0] == board[row][1] && board[row][1] == board[row][2]) {
+            if (board[row][0] === board[row][1] && board[row][1] === board[row][2]) {
                 if (board[row][0] == "player2")
                     return +10;
                 else if (board[row][0] == "player1")
@@ -181,8 +201,9 @@ const gameController = (function() {
             }
         }    
 
+        // Evaluate Vertically
         for (let col = 0; col < 3; col++) {
-            if (board[0][col] == board[1][col] && board[1][col] == board[2][col]) {
+            if (board[0][col] === board[1][col] && board[1][col] === board[2][col]) {
                 if (board[0][col] == "player2")
                     return +10;
                 else if (board[0][col] == "player1")
@@ -190,14 +211,16 @@ const gameController = (function() {
             }
         }
 
-        if (board[0][0] == board[1][1] && board[1][1] == board[2][2]) {
+        // Evaluate Diagonally
+        if (board[0][0] === board[1][1] && board[1][1] === board[2][2]) {
             if (board[0][0] == "player2")
                 return +10;
             else if (board[0][0] == "player1")
                 return -10;
         }
 
-        if (board[0][2] == board[1][1] && board[1][1] == board[2][0]) {
+        // Evaluate Diagonally
+        if (board[0][2] === board[1][1] && board[1][1] === board[2][0]) {
             if (board[0][2] == "player2")
                 return +10;
             else if (board[0][2] == "player1")
@@ -209,14 +232,17 @@ const gameController = (function() {
     }
 
     function minimax(board, depth, maximizingPlayer) {
+
         // check if game is over
         let score = evaluateBoard(board);
 
-        if (score === 10)
+        // console.log(`score is: ${score}`);
+
+        if (score == 10)
             return score;
-        if (score === -10)
+        if (score == -10)
             return score;
-        if (getTurnCounter() >= 9)
+        if (!isOpenSpots(board))
             return 0;
         
         if (maximizingPlayer) {
@@ -227,18 +253,20 @@ const gameController = (function() {
                     if (board[y][x] === "empty") {
                         gameBoard.setBoard(x, y, "player2");
 
-                        maxEval = Math.max(maxEval, minimax(board, depth + 1, !maximizingPlayer));
-
+                        let eval = minimax(gameBoard.getBoard(), depth+1, !maximizingPlayer);
                         gameBoard.setBoard(x, y, "empty");
+                        
+                        maxEval = Math.max(maxEval, eval);
+
 
                     }
                     
                 }
                 
             }
+            // console.log(`max eval for maximizer is: ${maxEval - depth}`);
             return maxEval-depth;
-        }
-
+        } 
         else {
             let maxEval = 1000; 
 
@@ -250,13 +278,16 @@ const gameController = (function() {
                         gameBoard.setBoard(x, y, "player1");
                         // console.log(board);
 
-                        maxEval = Math.min(maxEval, minimax(board, depth + 1, !maximizingPlayer));
-
+                        let eval = minimax(gameBoard.getBoard(), depth + 1, !maximizingPlayer);
                         gameBoard.setBoard(x, y, "empty");
+
+                        maxEval = Math.min(maxEval, eval);
+
 
                     }
                 }
             }
+            // console.log(`max eval for minimizer is: ${maxEval + depth}`);
             return maxEval+depth;
         }
     }
@@ -268,19 +299,30 @@ const gameController = (function() {
         bestMove.row = -1;
         bestMove.col = -1;
 
+        // console.log(`finding best move on: ${gameBoard.getBoard()}`);
+
         for (let y = 0; y < 3; y++) {
             for (let x = 0; x < 3; x++) {
+
+                // console.log(x, y);
                 
                 if (board[y][x] === "empty") {
                     gameBoard.setBoard(x, y, "player2");
+
+                    // console.log(gameBoard.getBoard());
                     
                     let moveVal = minimax(board, 0, false);
+
+                    console.log(`moveVal: ${moveVal}`);
+
                     gameBoard.setBoard(x, y, "empty");
 
                     if (moveVal > bestVal) {
                         bestMove.row = y;
                         bestMove.col = x;
                         bestVal = moveVal;
+
+                        console.log(`bestVal: ${bestVal}`);
                     }
                 }
                 
@@ -302,7 +344,15 @@ const gameController = (function() {
         }
     }
 
-    return {clickCell, getCurrentPlayer, switchPlayer, getTurnCounter, addTurn, evaluateBoard, findBestMove, makeBestMove}
+    return {
+        clickCell, 
+        getCurrentPlayer, 
+        switchPlayer, getTurnCounter, 
+        addTurn, 
+        evaluateBoard, 
+        findBestMove, 
+        makeBestMove
+    }
 
 })();
 
