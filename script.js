@@ -236,7 +236,6 @@ const gameController = (function() {
                 }
                 
             }
-
             return maxEval-depth;
         }
 
@@ -258,14 +257,13 @@ const gameController = (function() {
                     }
                 }
             }
-
             return maxEval+depth;
         }
     }
 
     function findBestMove(board) {
 
-        let bestVal = -Infinity;
+        let bestVal = -1000;
         let bestMove = new Move();
         bestMove.row = -1;
         bestMove.col = -1;
