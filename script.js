@@ -32,51 +32,21 @@ let gameBoard = (function() {
             return;
         }
 
-        checkForWin(_currentPlayer);
+        checkForWin(board);
         
     }
     
-    function checkForWin(player) {
+    function checkForWin(board) {
 
-        for (let y = 0; y < board.length; y++) {
-            for (let x = 0; x < board[y].length; x++) {
-
-                if (board[y][x] === player) {
-                    // console.log(`found ${player} at ${x}, ${y}`);
-                    if (board[y][x+1] === player) {
-                        // console.log("found horizontal pair");
-                        if (board[y][x+2] === player) {
-                            console.log(`CONGRATS ${player} found a horizontal match 3`);
-                        } else break;
-                    }
-                    if (y < 2 && board[y+1][x] === player) {
-                        // console.log("found vertical pair");
-                        if (y < 1 && board[y+2][x] === player) {
-                            console.log(`CONGRATS ${player} found a vertical match 3`);
-                        } else break;
-                    }
-                    if (y < 2 && board[y+1][x+1] === player) {
-                        if (y < 1 && board[y+2][x+2] === player) {
-                            console.log(`CONGRATS ${player} found a diagonal match3`);
-                        } else break;
-                    }
-                    if (y < 2 && board[y+1][x-1] === player) {
-                        if (y < 1 && board[y+2][x-2] === player) {
-                            console.log(`CONGRATS ${player} found a diagonal match 3`);
-                        } else break;
-                    }
-                }
-            }
-            
+        if (gameController.evaluateBoard(board) === 10) {
+            console.log("CPU wins")
         }
-
+        else if (gameController.evaluateBoard(board) === -10) {
+            console.log("Player 1 wins!");
+        }
         if (gameController.getTurnCounter() >= 9) {
             console.log("TIE GAME")
         }
-    }
-
-    function getBoard() {
-        return board;
     }
 
     function setBoard(x, y, value) {
@@ -86,9 +56,8 @@ let gameBoard = (function() {
     return { 
         createBoard, 
         checkCell, 
-        board, 
-        getBoard, 
-        setBoard,
+        board,
+        setBoard
     };
 
 })();
@@ -174,9 +143,7 @@ const gameController = (function() {
         if (currentPlayer === "player1") {
             currentPlayer = "player2";
 
-            console.log(`initial gameboard is: ${gameBoard.getBoard()}`);
-
-            makeBestMove(findBestMove(gameBoard.getBoard()));
+            makeBestMove(findBestMove(gameBoard.board));
             displayController.refreshBoard();
 
         } else if (currentPlayer === "player2") {
@@ -253,7 +220,7 @@ const gameController = (function() {
                     if (board[y][x] === "empty") {
                         gameBoard.setBoard(x, y, "player2");
 
-                        let eval = minimax(gameBoard.getBoard(), depth+1, !maximizingPlayer);
+                        let eval = minimax(gameBoard.board, depth+1, !maximizingPlayer);
                         gameBoard.setBoard(x, y, "empty");
                         
                         maxEval = Math.max(maxEval, eval);
@@ -264,7 +231,6 @@ const gameController = (function() {
                 }
                 
             }
-            // console.log(`max eval for maximizer is: ${maxEval - depth}`);
             return maxEval-depth;
         } 
         else {
@@ -276,9 +242,8 @@ const gameController = (function() {
                     if (board[y][x] === "empty") {
 
                         gameBoard.setBoard(x, y, "player1");
-                        // console.log(board);
 
-                        let eval = minimax(gameBoard.getBoard(), depth + 1, !maximizingPlayer);
+                        let eval = minimax(gameBoard.board, depth + 1, !maximizingPlayer);
                         gameBoard.setBoard(x, y, "empty");
 
                         maxEval = Math.min(maxEval, eval);
@@ -287,7 +252,6 @@ const gameController = (function() {
                     }
                 }
             }
-            // console.log(`max eval for minimizer is: ${maxEval + depth}`);
             return maxEval+depth;
         }
     }
@@ -299,7 +263,6 @@ const gameController = (function() {
         bestMove.row = -1;
         bestMove.col = -1;
 
-        // console.log(`finding best move on: ${gameBoard.getBoard()}`);
 
         for (let y = 0; y < 3; y++) {
             for (let x = 0; x < 3; x++) {
@@ -308,8 +271,6 @@ const gameController = (function() {
                 
                 if (board[y][x] === "empty") {
                     gameBoard.setBoard(x, y, "player2");
-
-                    // console.log(gameBoard.getBoard());
                     
                     let moveVal = minimax(board, 0, false);
 
@@ -351,7 +312,9 @@ const gameController = (function() {
         addTurn, 
         evaluateBoard, 
         findBestMove, 
-        makeBestMove
+        makeBestMove,
+        turnCounter,
+        getTurnCounter
     }
 
 })();
