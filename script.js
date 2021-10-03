@@ -4,7 +4,6 @@ let gameBoard = (function() {
     const board = [];
     
     function createBoard (width, height) {
-
         for (let i = 0; i < width; i++) {
             board[i] = [];
         }
@@ -13,11 +12,8 @@ let gameBoard = (function() {
             for (let j = 0; j < height; j++) {
                 board[i][j] = "empty";
             }
-            
         }
-
         return board;
-
     }
 
     function checkCell (i, j) {
@@ -39,13 +35,13 @@ let gameBoard = (function() {
     function checkForWin(board) {
 
         if (gameController.evaluateBoard(board) === 10) {
-            console.log("CPU wins")
+            displayController.displayModal("CPU Wins!");
         }
         else if (gameController.evaluateBoard(board) === -10) {
-            console.log("Player 1 wins!");
+            displayController.displayModal("Player 1 Wins!");
         }
-        if (gameController.getTurnCounter() >= 9) {
-            console.log("TIE GAME")
+        else if (gameController.getTurnCounter() >= 8 && gameController.evaluateBoard(board) === 0) {
+            displayController.displayModal("Tie Game!");
         }
     }
 
@@ -58,16 +54,32 @@ let gameBoard = (function() {
         checkCell, 
         board,
         setBoard
-    };
+        };
 
 })();
 
 let displayController = (function() {
-    'use strict'
 
     const gameContainer = document.querySelector(".game-container");
+    const modal = document.querySelector(".modal");
+    const modalText = document.querySelector(".modalText");
+    const modalOverlay = document.querySelector(".modalOverlay");
+    const modalResetButton = document.querySelector(".modalButton");
+    const currentPlayerText = document.querySelector(".current-player")
+
+    modalResetButton.addEventListener('click', () => {
+         gameController.resetGame();
+        });
+
 
     function refreshBoard() {
+        let _currentPlayer = '';
+        if (gameController.getCurrentPlayer() === "player1") {
+            _currentPlayer = "Player 1";
+        } else if (gameController.getCurrentPlayer() === "player2") {
+            _currentPlayer = "Player 2";
+        }
+        currentPlayerText.textContent = `${_currentPlayer}'s Turn`;
 
         clearBoard();
         for (let i = 0; i < gameBoard.board.length; i++) {
@@ -82,15 +94,16 @@ let displayController = (function() {
                 }
 
                 cell.addEventListener('click', () => {
-                    gameController.clickCell(i, j);
+
+                    // fix this when you add choice between CPU and player vs. player
+                    if (gameController.getCurrentPlayer() === "player1") {
+                        gameController.clickCell(i, j);
+                    }
                 })
 
                 gameContainer.appendChild(cell);
-                
             }
-
         }
-        
     }
 
     function clearBoard() {
@@ -99,12 +112,27 @@ let displayController = (function() {
         }
     };
 
-    return {refreshBoard};
+    function displayModal(message) {
+        modalText.textContent = message;
+        modal.classList.remove("closed");
+        modalOverlay.classList.remove("closed");
+    }
+
+    function clearModal() {
+        modal.classList.add("closed");
+        modalOverlay.classList.add("closed");
+    }
+
+    return {
+        refreshBoard,
+        displayModal,
+        clearModal
+    };
 
 })();
 
 const Player = (name) => {
-
+    let wins = 0;
 }
 
 const player1 = Player("Ian");
@@ -114,6 +142,7 @@ const gameController = (function() {
 
     let currentPlayer = "player1";    // eventually add a function that randomizes this starting value
     let turnCounter = 0;
+    const turnTime = 500;             // time CPU waits before clicking on cell it has chosen
 
     function isOpenSpots(board) {
         for (let y = 0; y < 3; y++) {
@@ -201,19 +230,17 @@ const gameController = (function() {
     function minimax(board, depth, maximizingPlayer) {
 
         // check if game is over
-        let score = evaluateBoard(board);
+        let _score = evaluateBoard(board);
 
-        // console.log(`score is: ${score}`);
-
-        if (score == 10)
-            return score;
-        if (score == -10)
-            return score;
+        if (_score == 10)
+            return _score;
+        if (_score == -10)
+            return _score;
         if (!isOpenSpots(board))
             return 0;
         
         if (maximizingPlayer) {
-            let maxEval = -1000;
+            let _maxEval = -1000;
 
             for (let y = 0; y < board.length; y++) {
                 for (let x = 0; x < board[y].length; x++) {
@@ -223,7 +250,7 @@ const gameController = (function() {
                         let eval = minimax(gameBoard.board, depth+1, !maximizingPlayer);
                         gameBoard.setBoard(x, y, "empty");
                         
-                        maxEval = Math.max(maxEval, eval);
+                        _maxEval = Math.max(_maxEval, eval);
 
 
                     }
@@ -231,10 +258,10 @@ const gameController = (function() {
                 }
                 
             }
-            return maxEval-depth;
+            return _maxEval-depth;
         } 
         else {
-            let maxEval = 1000; 
+            let _maxEval = 1000; 
 
             for (let y = 0; y < board.length; y++) {
                 for (let x = 0; x < board[y].length; x++) {
@@ -246,13 +273,13 @@ const gameController = (function() {
                         let eval = minimax(gameBoard.board, depth + 1, !maximizingPlayer);
                         gameBoard.setBoard(x, y, "empty");
 
-                        maxEval = Math.min(maxEval, eval);
+                        _maxEval = Math.min(_maxEval, eval);
 
 
                     }
                 }
             }
-            return maxEval+depth;
+            return _maxEval+depth;
         }
     }
 
@@ -266,24 +293,17 @@ const gameController = (function() {
 
         for (let y = 0; y < 3; y++) {
             for (let x = 0; x < 3; x++) {
-
-                // console.log(x, y);
                 
                 if (board[y][x] === "empty") {
                     gameBoard.setBoard(x, y, "player2");
                     
                     let moveVal = minimax(board, 0, false);
-
-                    console.log(`moveVal: ${moveVal}`);
-
                     gameBoard.setBoard(x, y, "empty");
 
                     if (moveVal > bestVal) {
                         bestMove.row = y;
                         bestMove.col = x;
                         bestVal = moveVal;
-
-                        console.log(`bestVal: ${bestVal}`);
                     }
                 }
                 
@@ -295,14 +315,24 @@ const gameController = (function() {
     }
 
     function makeBestMove(bestMove) {
-        clickCell(bestMove.row, bestMove.col);
-        console.log(`clicked on ${bestMove.col}, ${bestMove.row}`);
+        setTimeout(() => {
+            clickCell(bestMove.row, bestMove.col)
+        }, turnTime
+            );
     }
 
     class Move {
         constructor() {
             let row,col;
         }
+    }
+
+    function resetGame() {
+        turnCounter = 0;
+        currentPlayer = "player1";
+        gameBoard.createBoard(3, 3);
+        displayController.clearModal();
+        displayController.refreshBoard();
     }
 
     return {
@@ -314,12 +344,13 @@ const gameController = (function() {
         findBestMove, 
         makeBestMove,
         turnCounter,
-        getTurnCounter
+        getTurnCounter,
+        resetGame
     }
 
 })();
 
 
-console.log(gameBoard.createBoard(3, 3));
+gameBoard.createBoard(3, 3);
 
 displayController.refreshBoard();
