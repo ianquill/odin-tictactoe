@@ -3,7 +3,7 @@ let gameBoard = (function() {
     // create board
     const board = [];
     
-    function createBoard (width, height) {
+    function createBoard(width, height) {
         for (let i = 0; i < width; i++) {
             board[i] = [];
         }
@@ -16,7 +16,7 @@ let gameBoard = (function() {
         return board;
     }
 
-    function checkCell (i, j) {
+    function checkCell(i, j) {
         // check cell position at board[i][j] if it has a value stored
         const _currentPlayer = gameController.getCurrentPlayer();
 
@@ -65,11 +65,25 @@ let displayController = (function() {
     const modalText = document.querySelector(".modalText");
     const modalOverlay = document.querySelector(".modalOverlay");
     const modalResetButton = document.querySelector(".modalButton");
-    const currentPlayerText = document.querySelector(".current-player")
+    const currentPlayerText = document.querySelector(".current-player");
+    const startGameButton = document.querySelector(".menu-button");
+    const startMenu = document.querySelector(".start-menu");
 
     modalResetButton.addEventListener('click', () => {
          gameController.resetGame();
         });
+
+    startGameButton.addEventListener('click', () => {
+        startMenu.classList.add("fade-out");
+
+        setTimeout(() => {
+            startMenu.classList.add("closed");
+            gameBoard.createBoard(3, 3);
+            refreshBoard();
+            gameContainer.classList.add("fade-in");
+            currentPlayerText.classList.add("fade-in");
+        }, 500);
+    });
 
 
     function refreshBoard() {
@@ -85,12 +99,14 @@ let displayController = (function() {
         for (let i = 0; i < gameBoard.board.length; i++) {
             for (let j = 0; j < gameBoard.board[i].length; j++) {
                 const cell = document.createElement('div');
+                const cellText = document.createElement('p');
                 cell.classList.add("cell");
+                cellText.classList.add("cell-text");
                 
                 if (gameBoard.board[i][j] === "player1") {
-                    cell.textContent = "O";
+                    cellText.textContent = "X";
                 } else if (gameBoard.board[i][j] === "player2") {
-                    cell.textContent = "X";
+                    cellText.textContent = "O";
                 }
 
                 cell.addEventListener('click', () => {
@@ -101,6 +117,7 @@ let displayController = (function() {
                     }
                 })
 
+                cell.appendChild(cellText);
                 gameContainer.appendChild(cell);
             }
         }
@@ -140,9 +157,10 @@ const player2 = Player("Eleanor");
 
 const gameController = (function() {
 
-    let currentPlayer = "player1";    // eventually add a function that randomizes this starting value
+    let gameMode = "";
+    let currentPlayer = "player1";    
     let turnCounter = 0;
-    const turnTime = 500;             // time CPU waits before clicking on cell it has chosen
+    const turnTime = 500;   // time(ms) CPU waits before clicking on cell it has chosen
 
     function isOpenSpots(board) {
         for (let y = 0; y < 3; y++) {
@@ -290,7 +308,7 @@ const gameController = (function() {
         bestMove.row = -1;
         bestMove.col = -1;
 
-
+        // Iterate through board, running minimax on each position recursively
         for (let y = 0; y < 3; y++) {
             for (let x = 0; x < 3; x++) {
                 
@@ -317,8 +335,7 @@ const gameController = (function() {
     function makeBestMove(bestMove) {
         setTimeout(() => {
             clickCell(bestMove.row, bestMove.col)
-        }, turnTime
-            );
+        }, turnTime);
     }
 
     class Move {
@@ -345,12 +362,7 @@ const gameController = (function() {
         makeBestMove,
         turnCounter,
         getTurnCounter,
-        resetGame
+        resetGame,
+        gameMode
     }
-
 })();
-
-
-gameBoard.createBoard(3, 3);
-
-displayController.refreshBoard();

@@ -1,18 +1,48 @@
 body {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    min-height: 75vh;
     width: 100%;
     align-items: center;
     justify-content: center;
 
     font-family: Arial, Helvetica, sans-serif;
+    background-color: #2C363F;
+    color: #F2F5EA;
+}
+
+@keyframes fadeOut {
+    0% {opacity: 1;}
+    100% {opacity: 0;}
+}
+
+@keyframes fadeIn {
+    0% {opacity: 0;}
+    100% {opacity: 1;}
+}
+
+h1 {
+    font-size: 124px;
+}
+
+.fade-in {
+    animation: fadeIn 500ms;
+}
+
+.fade-out {
+    animation: fadeOut 500ms;
+}
+
+.start-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
 }
 
 .current-player {
-    font-size: 36px;
+    font-size: 24px;
     font-weight: bold;
-    text-transform: uppercase;
+    padding: 26px;
 }
 
 .modal {
@@ -21,15 +51,17 @@ body {
     flex-direction: column;
     justify-content: space-around;
     z-index: 10;
-    background-color: white;
-    width: 200px;
-    height: 200px;
+    background-color: #D6DBD2;
+    width: 400px;
+    height: 400px;
     text-align: center;
-    border: 2px solid black;
     border-radius: 10px;
+    color: #2C363F;
+    font-weight: bold;
+    font-size: 48px;
 }
 
-.modal.closed {
+.closed {
     display: none;
 }
 
@@ -46,12 +78,18 @@ body {
     display: none;
 }
 
-.modalButton {
+button {
     flex: 0 0 auto;
     align-self: center;
     border: 0;
     padding: 10px;
     border-radius: 10px;
+    font-size: 24px;
+    padding: 24px;
+}
+
+button:hover {
+    filter: brightness(85%);
 }
 
 .game-container {
@@ -61,29 +99,41 @@ body {
     height: min-content;
     justify-content: center;
     grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);                                         
+    grid-template-rows: repeat(3, 1fr);                          
 }
-
 
 .cell {
     display: flex;
     justify-content: center;
     align-items: center;
     
-    font-size: 60px;
+    font-size: 172px;
 
-    width: 100px;
-    height: 100px;
+    width: 200px;
+    height: 200px;
+    color: #BBC7A4;
 }
 
+
 .cell:nth-child(-n+6) {
-    border-bottom: 2px black solid;
+    border-bottom: 6px #F2F5EA solid;
 }
 
 .cell:nth-child(3n-2) {
-    border-right: 2px black solid;
+    border-right: 6px #F2F5EA solid;
 }
 
 .cell:nth-child(3n-1) {
-    border-right: 2px black solid;
+    border-right: 6px #F2F5EA solid;
+}
+
+footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    color: #D6DBD2;
+    font-weight: bold;
+    text-align: center;
+    padding-bottom: 15px;
 }
