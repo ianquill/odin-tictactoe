@@ -114,6 +114,9 @@ button:hover {
     color: #BBC7A4;
 }
 
+.cell-text {
+    user-select: none;
+}
 
 .cell:nth-child(-n+6) {
     border-bottom: 6px #F2F5EA solid;
