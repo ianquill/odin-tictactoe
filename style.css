@@ -1,3 +1,13 @@
+@font-face {
+    font-family: 'Altone Regular Oblique';
+    src: url('fonts/altonetrial-regularoblique-webfont.woff') format('woff'),
+        url('fonts/altonetrial-regularoblique-webfont.woff2') format('woff2');
+    font-family: 'AltoneBoldOblique';
+    src: url('fonts/altonetrial-boldoblique-webfont.woff') format('woff'),
+        url('fonts/altonetrial-boldoblique-webfont.woff2') format('woff2');
+
+}
+
 body {
     display: flex;
     flex-direction: column;
@@ -6,9 +16,13 @@ body {
     align-items: center;
     justify-content: center;
 
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: "AltoneBoldOblique", Arial, Helvetica, sans-serif;
     background-color: #2C363F;
     color: #F2F5EA;
+
+    background-image: url('img/Untitled.png');
+    background-size: cover;
+    filter: opacity(0.75);
 }
 
 @keyframes fadeOut {
@@ -23,6 +37,7 @@ body {
 
 h1 {
     font-size: 124px;
+    user-select: none;
 }
 
 .fade-in {
@@ -74,6 +89,10 @@ h1 {
     z-index: 5;
 }
 
+.modalText {
+    user-select: none;
+}
+
 .modalOverlay.closed {
     display: none;
 }
@@ -86,6 +105,8 @@ button {
     border-radius: 10px;
     font-size: 24px;
     padding: 24px;
+    /* font-family: 'Altone Regular Oblique'; */
+    font-family: Arial;
 }
 
 button:hover {
@@ -109,8 +130,8 @@ button:hover {
     
     font-size: 172px;
 
-    width: 200px;
-    height: 200px;
+    width: 175px;
+    height: 175px;
     color: #BBC7A4;
 }
 
